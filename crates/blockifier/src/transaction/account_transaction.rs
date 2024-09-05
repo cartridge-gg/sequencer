@@ -90,11 +90,12 @@ pub struct ExecutionFlags {
     pub only_query: bool,
     pub charge_fee: bool,
     pub validate: bool,
+    pub nonce_check: bool
 }
 
 impl Default for ExecutionFlags {
     fn default() -> Self {
-        Self { only_query: false, charge_fee: true, validate: true }
+        Self { only_query: false, charge_fee: true, validate: true, nonce_check: true }
     }
 }
 
@@ -145,6 +146,7 @@ impl AccountTransaction {
             only_query: false,
             charge_fee: enforce_fee(&tx, false),
             validate: true,
+            nonce_check: true
         };
         AccountTransaction { tx, execution_flags }
     }
@@ -800,7 +802,7 @@ impl<U: UpdatableState> ExecutableTransaction<U> for AccountTransaction {
         self.verify_tx_version(tx_context.tx_info.version())?;
 
         // Nonce and fee check should be done before running user code.
-        let strict_nonce_check = true;
+        let strict_nonce_check = self.execution_flags.nonce_check;
         self.perform_pre_validation_stage(state, &tx_context, strict_nonce_check)?;
 
         // Run validation and execution.
