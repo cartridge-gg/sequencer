@@ -660,8 +660,13 @@ fn execute_transactions(
             _ => None,
         };
         let blockifier_tx = to_blockifier_tx(tx, tx_hash, transaction_index)?;
-        let tx_execution_info_result =
-            blockifier_tx.execute(&mut transactional_state, &block_context, charge_fee, validate);
+        let tx_execution_info_result = blockifier_tx.execute(
+            &mut transactional_state,
+            &block_context,
+            charge_fee,
+            validate,
+            true,
+        );
         let state_diff =
             induced_state_diff(&mut transactional_state, deprecated_declared_class_hash)?;
         transactional_state.commit();

@@ -61,6 +61,7 @@ macro_rules! implement_inner_tx_getter_calls {
 pub struct ExecutionFlags {
     pub charge_fee: bool,
     pub validate: bool,
+    pub nonce_check: bool,
     pub concurrency_mode: bool,
 }
 
@@ -73,10 +74,12 @@ pub trait ExecutableTransaction<U: UpdatableState>: Sized {
         block_context: &BlockContext,
         charge_fee: bool,
         validate: bool,
+        nonce_check: bool,
     ) -> TransactionExecutionResult<TransactionExecutionInfo> {
         log::debug!("Executing Transaction...");
         let mut transactional_state = TransactionalState::create_transactional(state);
-        let execution_flags = ExecutionFlags { charge_fee, validate, concurrency_mode: false };
+        let execution_flags =
+            ExecutionFlags { charge_fee, validate, concurrency_mode: false, nonce_check };
         let execution_result =
             self.execute_raw(&mut transactional_state, block_context, execution_flags);
 
