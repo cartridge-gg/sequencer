@@ -12,6 +12,7 @@ use crate::context::{BlockContext, TransactionContext};
 use crate::execution::call_info::{CallInfo, Retdata};
 use crate::execution::contract_class::ContractClass;
 use crate::execution::entry_point::{CallEntryPoint, CallType, EntryPointExecutionContext};
+use crate::execution::stack_trace::{gen_transaction_execution_error_trace, ErrorStack};
 use crate::fee::actual_cost::TransactionReceipt;
 use crate::fee::fee_checks::{FeeCheckReportFields, PostExecutionReport};
 use crate::fee::fee_utils::{
@@ -571,9 +572,11 @@ impl AccountTransaction {
                         // revert case, compute resources by adding consumed execution steps to
                         // validation resources).
                         execution_state.abort();
+                        let mut error_stack = ErrorStack::default();
+                        error_stack.push(post_execution_error.to_string().into());
                         Ok(ValidateExecuteCallInfo::new_reverted(
                             validate_call_info,
-                            post_execution_error.to_string(),
+                            error_stack,
                             TransactionReceipt {
                                 fee: post_execution_report.recommended_fee(),
                                 ..revert_cost
@@ -598,7 +601,7 @@ impl AccountTransaction {
                     PostExecutionReport::new(state, &tx_context, &revert_cost, charge_fee)?;
                 Ok(ValidateExecuteCallInfo::new_reverted(
                     validate_call_info,
-                    execution_error.to_string(),
+                    gen_transaction_execution_error_trace(&execution_error),
                     TransactionReceipt {
                         fee: post_execution_report.recommended_fee(),
                         ..revert_cost
@@ -721,7 +724,7 @@ impl TransactionInfoCreator for AccountTransaction {
 struct ValidateExecuteCallInfo {
     validate_call_info: Option<CallInfo>,
     execute_call_info: Option<CallInfo>,
-    revert_error: Option<String>,
+    revert_error: Option<ErrorStack>,
     final_cost: TransactionReceipt,
 }
 
@@ -736,7 +739,7 @@ impl ValidateExecuteCallInfo {
 
     pub fn new_reverted(
         validate_call_info: Option<CallInfo>,
-        revert_error: String,
+        revert_error: ErrorStack,
         final_cost: TransactionReceipt,
     ) -> Self {
         Self {

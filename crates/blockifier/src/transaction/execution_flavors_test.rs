@@ -502,7 +502,14 @@ fn test_simulate_validate_charge_fee_mid_execution(
     .unwrap();
     assert_eq!(tx_execution_info.is_reverted(), charge_fee);
     if charge_fee {
-        assert!(tx_execution_info.revert_error.clone().unwrap().contains("no remaining steps"));
+        assert!(
+            tx_execution_info
+                .revert_error
+                .as_ref()
+                .unwrap()
+                .to_string()
+                .contains("no remaining steps")
+        );
     }
     check_gas_and_fee(
         &block_context,
@@ -552,7 +559,9 @@ fn test_simulate_validate_charge_fee_mid_execution(
     })
     .execute(&mut state, &low_step_block_context, charge_fee, validate, true)
     .unwrap();
-    assert!(tx_execution_info.revert_error.clone().unwrap().contains("no remaining steps"));
+    assert!(
+        tx_execution_info.revert_error.as_ref().unwrap().to_string().contains("no remaining steps")
+    );
     // Complete resources used are reported as transaction_receipt.resources; but only the charged
     // final fee is shown in actual_fee. As a sanity check, verify that the fee derived directly
     // from the consumed resources is also equal to the expected fee.
@@ -637,11 +646,9 @@ fn test_simulate_validate_charge_fee_post_execution(
     .unwrap();
     assert_eq!(tx_execution_info.is_reverted(), charge_fee);
     if charge_fee {
-        assert!(tx_execution_info.revert_error.clone().unwrap().starts_with(if is_deprecated {
-            "Insufficient max fee"
-        } else {
-            "Insufficient max L1 gas"
-        }));
+        assert!(tx_execution_info.revert_error.as_ref().unwrap().to_string().starts_with(
+            if is_deprecated { "Insufficient max fee" } else { "Insufficient max L1 gas" }
+        ));
     }
 
     check_gas_and_fee(
@@ -705,8 +712,9 @@ fn test_simulate_validate_charge_fee_post_execution(
         assert!(
             tx_execution_info
                 .revert_error
-                .clone()
+                .as_ref()
                 .unwrap()
+                .to_string()
                 .contains("Insufficient fee token balance.")
         );
     }

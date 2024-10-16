@@ -67,7 +67,7 @@ impl ThinTransactionExecutionInfo {
                 block_context.block_info().use_kzg_da,
                 true,
             ),
-            revert_error: tx_execution_info.revert_error,
+            revert_error: tx_execution_info.revert_error.map(|e| e.to_string()),
             total_gas: tx_execution_info.transaction_receipt.gas,
         }
     }

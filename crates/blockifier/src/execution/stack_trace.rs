@@ -17,6 +17,7 @@ pub mod test;
 pub const TRACE_LENGTH_CAP: usize = 15000;
 pub const TRACE_EXTRA_CHARS_SLACK: usize = 100;
 
+#[derive(Debug, PartialEq)]
 pub enum PreambleType {
     CallContract,
     LibraryCall,
@@ -33,6 +34,7 @@ impl PreambleType {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct EntryPointErrorFrame {
     pub depth: usize,
     pub preamble_type: PreambleType,
@@ -64,6 +66,7 @@ impl From<&EntryPointErrorFrame> for String {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct VmExceptionFrame {
     pub pc: Relocatable,
     pub error_attr_value: Option<String>,
@@ -86,6 +89,7 @@ impl From<&VmExceptionFrame> for String {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub enum Frame {
     EntryPoint(EntryPointErrorFrame),
     Vm(VmExceptionFrame),
@@ -120,14 +124,20 @@ impl From<String> for Frame {
     }
 }
 
-#[derive(Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct ErrorStack {
     pub stack: Vec<Frame>,
 }
 
 impl From<ErrorStack> for String {
     fn from(value: ErrorStack) -> Self {
-        let error_stack_str = value.stack.iter().map(String::from).join("\n");
+        value.to_string()
+    }
+}
+
+impl ToString for ErrorStack {
+    fn to_string(&self) -> String {
+        let error_stack_str = self.stack.iter().map(String::from).join("\n");
 
         // When the trace string is too long, trim it in a way that keeps both the beginning and
         // end.

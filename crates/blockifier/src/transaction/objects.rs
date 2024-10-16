@@ -24,6 +24,7 @@ use strum_macros::EnumIter;
 use crate::abi::constants as abi_constants;
 use crate::blockifier::block::BlockInfo;
 use crate::execution::call_info::{CallInfo, ExecutionSummary, MessageL1CostInfo, OrderedEvent};
+use crate::execution::stack_trace::ErrorStack;
 use crate::fee::actual_cost::TransactionReceipt;
 use crate::fee::eth_gas_constants;
 use crate::fee::fee_utils::{calculate_l1_gas_by_vm_usage, get_fee_by_gas_vector};
@@ -215,7 +216,7 @@ pub struct TransactionExecutionInfo {
     pub execute_call_info: Option<CallInfo>,
     /// Fee transfer call info; [None] for `L1Handler`.
     pub fee_transfer_call_info: Option<CallInfo>,
-    pub revert_error: Option<String>,
+    pub revert_error: Option<ErrorStack>,
     /// The receipt of the transaction.
     /// Including the actual fee that was charged (in units of the relevant fee token),
     /// actual gas consumption the transaction is charged for data availability,
