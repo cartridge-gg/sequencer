@@ -17,7 +17,6 @@ pub mod test;
 pub const TRACE_LENGTH_CAP: usize = 15000;
 pub const TRACE_EXTRA_CHARS_SLACK: usize = 100;
 
-#[cfg_attr(feature = "transaction_serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PreambleType {
     CallContract,
     LibraryCall,
@@ -34,7 +33,6 @@ impl PreambleType {
     }
 }
 
-#[cfg_attr(feature = "transaction_serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EntryPointErrorFrame {
     pub depth: usize,
     pub preamble_type: PreambleType,
@@ -66,7 +64,6 @@ impl From<&EntryPointErrorFrame> for String {
     }
 }
 
-#[cfg_attr(feature = "transaction_serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VmExceptionFrame {
     pub pc: Relocatable,
     pub error_attr_value: Option<String>,
@@ -89,7 +86,6 @@ impl From<&VmExceptionFrame> for String {
     }
 }
 
-#[cfg_attr(feature = "transaction_serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Frame {
     EntryPoint(EntryPointErrorFrame),
     Vm(VmExceptionFrame),
@@ -124,7 +120,6 @@ impl From<String> for Frame {
     }
 }
 
-#[cfg_attr(feature = "transaction_serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Default)]
 pub struct ErrorStack {
     pub stack: Vec<Frame>,
